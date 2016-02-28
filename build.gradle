@@ -1,0 +1,30 @@
+group 'software.sitb'
+version '1.0.0.RELEASE'
+
+repositories {
+    maven { url "http://repo.sitb.software/content/groups/public/" }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
+apply from: 'base.gradle'
+apply from: 'libraries.gradle'
+apply from: 'provided.gradle'
+apply from: 'optional.gradle'
+
+
+dependencies {
+    compile lib.protostuff
+    compile lib.objenesis
+    compile lib.json
+    testCompile lib._test
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
