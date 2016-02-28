@@ -1,6 +1,8 @@
 package software.sitb.utils.crypto;
 
 
+import software.sitb.utils.binary.CodecUtils;
+
 public class DesUtils {
 
     public static byte[] desEncrypt(byte[] input, byte[] key) {
@@ -39,6 +41,20 @@ public class DesUtils {
         }
     }
 
+    /**
+     * 3des 加密,参数都是16进制字符串
+     *
+     * @param data 待加密数据
+     * @param key  密钥
+     * @return 加密后的数据
+     */
+    public static String tripDesEncrypt(String data, String key) {
+        byte[] byteData = CodecUtils.hex2byte(data);
+        byte[] byteKey = CodecUtils.hex2byte(key);
+        byte[] result = tripDesEncrypt(byteData, byteKey);
+        return CodecUtils.hexString(result);
+    }
+
     public static byte[] tripDesDecrypt(byte[] input, byte[] key) {
         if (key.length == 8) {
             return desDecrypt(input, key);
@@ -60,6 +76,13 @@ public class DesUtils {
         } else {
             throw new IllegalArgumentException("tripDesDecrypt only support keylength:8,16,24");
         }
+    }
+
+    public static String tripDesDecrypt(String data, String key) {
+        byte[] byteData = CodecUtils.hex2byte(data);
+        byte[] byteKey = CodecUtils.hex2byte(key);
+        byte[] result = tripDesDecrypt(byteData,byteKey);
+        return CodecUtils.hexString(result);
     }
 
     public static byte[] tripDesEncrypt(byte[] input, byte[] key1, byte[] key2, byte[] key3) {
