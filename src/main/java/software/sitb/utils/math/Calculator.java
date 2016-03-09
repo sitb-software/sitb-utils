@@ -83,6 +83,23 @@ public class Calculator {
     }
 
     /**
+     * 加法
+     *
+     * @param addend 加数
+     * @param augend 被加数
+     * @return 计算结果
+     */
+    public static BigDecimal add(BigDecimal addend, BigDecimal augend) {
+        if (null == addend) {
+            addend = BigDecimal.ZERO;
+        }
+        if (null == augend) {
+            augend = BigDecimal.ZERO;
+        }
+        return addend.add(augend);
+    }
+
+    /**
      * 减法计算
      *
      * @param subtrahend 减数
