@@ -17,7 +17,9 @@ public class Base64Utils {
     /**
      * base64 转图片
      *
-     * @param base64 base64值
+     * @param file   输出的文件
+     * @param base64 base64的图片信息字符串
+     * @throws IOException 写入文件失败时抛出
      */
     public static void toImageFile(File file, String base64) throws IOException {
         if (StringUtils.isEmpty(base64)) {
