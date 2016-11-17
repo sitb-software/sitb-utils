@@ -1,8 +1,8 @@
 group 'software.sitb'
-version '1.0.5.RELEASE'
+version '1.0.7.RELEASE'
 
 repositories {
-    maven { url "http://repo.sitb.software/content/groups/public/" }
+    maven { url "http://repo.sitb.software/repository/maven-public/" }
 }
 
 apply plugin: 'java'
