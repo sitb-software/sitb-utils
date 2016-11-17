@@ -134,7 +134,11 @@ public class Calculator {
         }
         BigDecimal tmpMultiplier = new BigDecimal(multiplier);
         BigDecimal tmpMultiplicand = new BigDecimal(multiplicand);
-        return tmpMultiplier.multiply(tmpMultiplicand).toString();
+        return multiply(tmpMultiplier, tmpMultiplicand).toString();
+    }
+
+    public static BigDecimal multiply(BigDecimal multiplier, BigDecimal multiplicand) {
+        return multiplier.multiply(multiplicand);
     }
 
     /**
