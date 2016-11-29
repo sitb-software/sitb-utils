@@ -1,9 +1,6 @@
 group 'software.sitb'
-version '1.0.7.RELEASE'
+version '1.0.8.RELEASE'
 
-repositories {
-    maven { url "http://repo.sitb.software/repository/maven-public/" }
-}
 
 apply plugin: 'java'
 apply plugin: 'idea'
@@ -12,6 +9,10 @@ apply from: 'base.gradle'
 apply from: 'libraries.gradle'
 apply from: 'provided.gradle'
 apply from: 'optional.gradle'
+
+repositories {
+    maven { url "${repoUrl}" }
+}
 
 
 dependencies {
