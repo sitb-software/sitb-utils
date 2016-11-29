@@ -15,7 +15,7 @@ public class HttpUtils {
 
     /**
      * 对象转化为url形式的字符串
-     * a=1&b=2
+     * a=1&amp;b=2
      *
      * @param params key，value形式的对象
      * @return url 字符串
