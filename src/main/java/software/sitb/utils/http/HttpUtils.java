@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import software.sitb.utils.json.Json;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -26,7 +26,7 @@ public class HttpUtils {
         }
 
         JsonNode json = Json.toJson(params);
-        Map<String, String> map = Json.fromJson(json.toString(), new TypeReference<HashMap<String, String>>() {
+        Map<String, String> map = Json.fromJson(json.toString(), new TypeReference<LinkedHashMap<String, String>>() {
         });
 
         StringBuilder args = new StringBuilder();
