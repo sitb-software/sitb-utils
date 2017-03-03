@@ -1,6 +1,5 @@
 group 'software.sitb'
-version '1.0.8.RELEASE'
-
+version '1.0.9.RELEASE'
 
 apply plugin: 'java'
 apply plugin: 'idea'
