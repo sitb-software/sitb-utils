@@ -161,7 +161,7 @@ public class Calculator {
      * @return 计算结果
      */
     public static String divide(String divisor, String dividend) {
-        return divide(divisor, dividend, 6, BigDecimal.ROUND_HALF_EVEN);
+        return divide(divisor, dividend, 6, BigDecimal.ROUND_HALF_EVEN).toString();
     }
 
 
@@ -174,7 +174,19 @@ public class Calculator {
      * @return 字符串表示的除法结果
      */
     public static String divide(String divisor, String dividend, int scale) {
-        return divide(divisor, dividend, scale, BigDecimal.ROUND_HALF_EVEN);
+        return divide(divisor, dividend, scale, BigDecimal.ROUND_HALF_EVEN).toString();
+    }
+
+    /**
+     * 除法,默认四舍五入方式为银行家模式
+     *
+     * @param divisor  除数
+     * @param dividend 被除数
+     * @param scale    舍入位数
+     * @return 字符串表示的除法结果
+     */
+    public static Long divide(Long divisor, Integer dividend, int scale) {
+        return divide(divisor, dividend, scale, BigDecimal.ROUND_HALF_EVEN).longValue();
     }
 
     /**
@@ -186,16 +198,23 @@ public class Calculator {
      * @param roundingMode 四舍五入模式
      * @return 字符串表示的除法结果
      */
-    public static String divide(String divisor, String dividend, int scale, int roundingMode) {
-        if (StringUtils.isEmpty(divisor)) {
+    public static BigDecimal divide(Object divisor, Object dividend, int scale, int roundingMode) {
+        if (null == divisor) {
+            divisor = 0;
+        }
+        if (null == dividend) {
+            dividend = 0;
+        }
+        if (divisor instanceof String && StringUtils.isEmpty((String) divisor)) {
             divisor = "0";
         }
-        if (StringUtils.isEmpty(dividend)) {
+        if (dividend instanceof String && StringUtils.isEmpty((String) dividend)) {
             dividend = "0";
         }
-        BigDecimal tmpDivisor = new BigDecimal(divisor);
-        BigDecimal tmpDividend = new BigDecimal(dividend);
-        return tmpDivisor.divide(tmpDividend, scale, roundingMode).toString();
+
+        BigDecimal tmpDivisor = new BigDecimal(divisor.toString());
+        BigDecimal tmpDividend = new BigDecimal(dividend.toString());
+        return tmpDivisor.divide(tmpDividend, scale, roundingMode);
     }
 
 
@@ -229,40 +248,5 @@ public class Calculator {
         BigDecimal tmp = new BigDecimal(roundNum);
         return tmp.setScale(scale, BigDecimal.ROUND_HALF_EVEN).toString();
     }
-
-
-    /**
-     * 判断指定的数字是否等于0
-     *
-     * @param number 需要判断的数
-     * @return 等于0返回true否则返回false
-     */
-    public static boolean equalsZero(String number) {
-        if (StringUtils.isEmpty(number)) {
-            number = "0";
-        }
-        return new BigDecimal(number).compareTo(BigDecimal.ZERO) == 0;
-    }
-
-    /**
-     * 判断指定的数字是否大于等于0
-     *
-     * @param number 需要判断的数
-     * @return boolean 大于等于返回true,否则返回false
-     */
-    public static boolean gtEqZero(String number) {
-        if (StringUtils.isEmpty(number)) {
-            number = "0";
-        }
-        BigDecimal tmp = new BigDecimal(number);
-        boolean result = false;
-        switch (tmp.compareTo(BigDecimal.ZERO)) {
-            case 0:
-            case 1:
-                result = true;
-        }
-        return result;
-    }
-
 
 }
