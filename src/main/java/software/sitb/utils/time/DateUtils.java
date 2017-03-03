@@ -10,6 +10,11 @@ import java.util.Date;
  */
 public class DateUtils {
 
+    /**
+     * 一周的开始是星期几
+     * 默认为星期一
+     */
+    private static int WEEK_START_AT = 2;
 
     /**
      * @return 一天的开始时间
@@ -63,9 +68,39 @@ public class DateUtils {
     public static Calendar weekFirstDay(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        calendar.set(Calendar.DAY_OF_WEEK, WEEK_START_AT);
         dayStartTime(calendar);
         return calendar;
+    }
+
+    /**
+     * @return 获取本月的第一天时间
+     */
+    public static Calendar monthFirstDay() {
+        return monthFirstDay(new Date());
+    }
+
+    /**
+     * 获取指定时间月的第一天时间
+     *
+     * @param date time
+     * @return date 的第一天
+     */
+    public static Calendar monthFirstDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+        dayStartTime(calendar);
+        return calendar;
+    }
+
+    /**
+     * 设置一周开始的时间
+     *
+     * @param startAt 一周开始的值
+     */
+    public static void setWeekStartAt(int startAt) {
+        WEEK_START_AT = startAt;
     }
 
 }
