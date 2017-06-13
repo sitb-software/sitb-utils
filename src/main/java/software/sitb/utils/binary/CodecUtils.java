@@ -142,4 +142,27 @@ public class CodecUtils {
             return hex2byte("0" + s);
         }
     }
+
+    /**
+     * Converts an integer into a byte array of hex
+     *
+     * @param value value
+     * @return bytes representation of integer
+     */
+    public static byte[] int2byte(int value) {
+        if (value < 0) {
+            return new byte[]{(byte) (value >>> 24 & 0xFF), (byte) (value >>> 16 & 0xFF),
+                    (byte) (value >>> 8 & 0xFF), (byte) (value & 0xFF)};
+        } else if (value <= 0xFF) {
+            return new byte[]{(byte) (value & 0xFF)};
+        } else if (value <= 0xFFFF) {
+            return new byte[]{(byte) (value >>> 8 & 0xFF), (byte) (value & 0xFF)};
+        } else if (value <= 0xFFFFFF) {
+            return new byte[]{(byte) (value >>> 16 & 0xFF), (byte) (value >>> 8 & 0xFF),
+                    (byte) (value & 0xFF)};
+        } else {
+            return new byte[]{(byte) (value >>> 24 & 0xFF), (byte) (value >>> 16 & 0xFF),
+                    (byte) (value >>> 8 & 0xFF), (byte) (value & 0xFF)};
+        }
+    }
 }
