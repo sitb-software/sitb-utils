@@ -1,11 +1,13 @@
 package software.sitb.utils.crypto;
 
+import org.apache.commons.codec.binary.Base64;
 import software.sitb.utils.binary.CodecUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -18,79 +20,33 @@ import java.security.spec.InvalidKeySpecException;
  */
 public class RSAUtil {
 
+    public static final int PK_BLOCK_SIZE = 53;
+
+    public static final int PRK_BLOCK_SIZE = 64;
 
     /**
-     * 使用指定的公钥进行加密,
-     * 填充方式默认使用RSA/ECB/NoPadding
+     * 使用私钥解密
      *
-     * @param publicKeyStr DER编码的公钥字符串
-     * @param data         需要加密的数据
-     * @return 16进制表示的加密后数据
+     * @param hexPrivateKey 16进制 表示的私钥
+     * @param ciphertext    密文
+     * @return 明文
+     * @throws Exception 解密失败
      */
-    public static String publicKeyEncryptWithDer(String publicKeyStr, byte[] data) throws Exception {
-        return publicKeyEncryptWithDer(publicKeyStr, data, Cipher.getInstance("RSA/ECB/NoPadding"));
-    }
-
-    /**
-     * 根据hex类型公钥 对数据进行加密
-     * 首先公钥得到mod和exp然后生成对象，根据对象对数据进行加密
-     *
-     * @param data         待加密数据（不足8位或8的倍数补F）
-     * @param cipher       注意填充方式：
-     *                     1:如果调用了加密机【RSA/ECB/NoPadding】
-     *                     2:此代码用了默认补位方式【RSA/None/PKCS1Padding】，不同JDK默认的补位方式可能不同，如Android默认是RSARSA/ECB/PKCS1Padding
-     * @param publicKeyStr 公钥字符串
-     * @return TheEncryptedData    经加密后的数据(16进制)
-     */
-    public static String publicKeyEncryptWithDer(String publicKeyStr, byte[] data, Cipher cipher) throws Exception {
-        byte[] cipherData = publicKeyEncryptWidthDer(publicKeyStr, data, cipher);
-        return CodecUtils.hexString(cipherData);
-    }
-
-    /**
-     * 根据hex类型公钥 对数据进行加密
-     * 首先公钥得到mod和exp然后生成对象，根据对象对数据进行加密
-     *
-     * @param data         待加密数据（不足8位或8的倍数补F）
-     * @param cipher       注意填充方式：
-     *                     1:如果调用了加密机【RSA/ECB/NoPadding】
-     *                     2:此代码用了默认补位方式【RSA/None/PKCS1Padding】，不同JDK默认的补位方式可能不同，如Android默认是RSARSA/ECB/PKCS1Padding
-     *                     RSA/None/NoPadding
-     * @param publicKeyStr 公钥字符串
-     * @return 经加密后的数据(二进制)
-     */
-    public static byte[] publicKeyEncryptWidthDer(String publicKeyStr, byte[] data, Cipher cipher) throws Exception {
-
-        //解析公钥串，拿到Modulus，Exponent
-        String[] pubModExp = RSA.parsePublicKey(publicKeyStr);
-
-        String mod = pubModExp[0];
-        String exp = pubModExp[1];
-
-        // 公钥
-        PublicKey publicKey = RSA.getPublicKey(mod, exp);
-
-        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        // 加密数据
-        return cipher.doFinal(data);
-    }
-
-    public static String privateKeyDecryptWithDer(String privateKeyStr, byte[] data) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, InvalidKeyException, InvalidKeySpecException, BadPaddingException, IOException {
-        byte[] result = privateKeyDecryptWithDer(privateKeyStr, data, Cipher.getInstance("RSA/ECB/NoPadding"));
+    public static String privateKeyDecryptWithHex(String hexPrivateKey, byte[] ciphertext) throws Exception {
+        byte[] result = privateKeyDecryptWithDer(hexPrivateKey, ciphertext, "RSA/ECB/NoPadding");
         return CodecUtils.hexString(result);
     }
-
 
     /**
      * 私钥解密
      *
-     * @param privateKeyStr 16进制 表示的私钥(der 格式)
-     * @param data          需要解密的数据
+     * @param hexPrivateKey 16进制 表示的私钥
+     * @param ciphertext    密文
      * @param cipher        填充方式
      * @return 解密以后的数据
      */
-    public static byte[] privateKeyDecryptWithDer(String privateKeyStr, byte[] data, Cipher cipher) throws BadPaddingException, NoSuchAlgorithmException, IOException, IllegalBlockSizeException, InvalidKeyException, InvalidKeySpecException {
-        return privateKeyDecryptWithDer(privateKeyStr, 9, data, cipher);
+    public static byte[] privateKeyDecryptWithDer(String hexPrivateKey, byte[] ciphertext, String cipher) throws BadPaddingException, NoSuchAlgorithmException, IOException, IllegalBlockSizeException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException {
+        return privateKeyDecryptWithDer(hexPrivateKey, 9, ciphertext, cipher);
     }
 
     /**
@@ -102,10 +58,185 @@ public class RSAUtil {
      * @param cipher        填充方式
      * @return 解密以后的数据
      */
-    public static byte[] privateKeyDecryptWithDer(String privateKeyStr, int sequence, byte[] data, Cipher cipher) throws NoSuchAlgorithmException, IOException, InvalidKeySpecException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+    public static byte[] privateKeyDecryptWithDer(String privateKeyStr, int sequence, byte[] data, String cipher) throws NoSuchAlgorithmException, IOException, InvalidKeySpecException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchPaddingException {
         PrivateKey privateKey = RSA.getPrivateKey(privateKeyStr, sequence);
+        Cipher c = Cipher.getInstance(cipher);
+        c.init(Cipher.DECRYPT_MODE, privateKey);
+        return c.doFinal(data);
+    }
+
+    public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, Cipher cipher) throws Exception {
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        return cipher.doFinal(data);
+
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            for (int offset = 0; offset < encrypted.length; offset += PRK_BLOCK_SIZE) {
+                int inputLen = encrypted.length - offset;
+                if (inputLen > PRK_BLOCK_SIZE) {
+                    inputLen = PRK_BLOCK_SIZE;
+                }
+
+                byte[] decryptedBlock = cipher.doFinal(encrypted, offset, inputLen);
+                outputStream.write(decryptedBlock);
+            }
+
+            return outputStream.toByteArray();
+        } catch (IllegalBlockSizeException e) {
+            throw new Exception("解密块大小不合法", e);
+        } catch (BadPaddingException e) {
+            throw new Exception("错误填充模式", e);
+        } catch (IOException e) {
+            throw new Exception("字节输出流异常", e);
+        }
+    }
+
+    /**
+     * 使用指定的公钥进行加密,
+     * 填充方式默认使用RSA/ECB/NoPadding
+     *
+     * @param hexPublicKey 十六进制表示DER编码的公钥字符串
+     * @param plaintext    需要加密的数据
+     * @return TheEncryptedData    经加密后的数据 十六进制表示
+     */
+    public static String publicKeyEncryptWithHex(String hexPublicKey, byte[] plaintext) throws Exception {
+        return publicKeyEncryptWithHex(hexPublicKey, plaintext, "RSA/ECB/NoPadding");
+    }
+
+    /**
+     * 根据hex类型公钥 对数据进行加密
+     * 首先公钥得到mod和exp然后生成对象，根据对象对数据进行加密
+     *
+     * @param plaintext    待加密数据（不足8位或8的倍数补F）
+     * @param cipher       注意填充方式：
+     *                     1:如果调用了加密机【RSA/ECB/NoPadding】
+     *                     2:此代码用了默认补位方式【RSA/None/PKCS1Padding】，不同JDK默认的补位方式可能不同，如Android默认是RSARSA/ECB/PKCS1Padding
+     * @param hexPublicKey 十六进制表示DER编码的公钥字符串
+     * @return TheEncryptedData    经加密后的数据 十六进制表示
+     */
+    public static String publicKeyEncryptWithHex(String hexPublicKey, byte[] plaintext, String cipher) throws Exception {
+        PublicKey publicKey = RSA.parsePublicKeyWithHex(hexPublicKey);
+        byte[] cipherData = publicKeyEncrypt(publicKey, plaintext, cipher);
+        return CodecUtils.hexString(cipherData);
+    }
+
+    /**
+     * 使用指定的公钥进行加密,
+     * 填充方式默认使用RSA/ECB/NoPadding
+     *
+     * @param publicKey 公钥
+     * @param plaintext 需要加密的数据
+     * @return TheEncryptedData    经加密后的数据 十六进制表示
+     */
+    public static String publicKeyEncryptWithHex(PublicKey publicKey, byte[] plaintext) throws Exception {
+        return publicKeyEncryptWithHex(publicKey, plaintext, "RSA/ECB/NoPadding");
+    }
+
+    /**
+     * 使用指定的公钥进行加密,
+     *
+     * @param publicKey 公钥
+     * @param plaintext 需要加密的数据
+     * @param cipher    cipher
+     * @return TheEncryptedData    经加密后的数据 十六进制表示
+     */
+    public static String publicKeyEncryptWithHex(PublicKey publicKey, byte[] plaintext, String cipher) throws Exception {
+        byte[] cipherData = publicKeyEncrypt(publicKey, plaintext, cipher);
+        return CodecUtils.hexString(cipherData);
+    }
+
+    /**
+     * 使用指定的公钥进行加密,
+     * 填充方式默认使用RSA/ECB/NoPadding
+     *
+     * @param base64PublicKey base64表示的公钥字符串
+     * @param plaintext       需要加密的数据
+     * @return TheEncryptedData    经加密后的数据 base64
+     */
+    public static String publicKeyEncryptWithBase64(String base64PublicKey, byte[] plaintext) throws Exception {
+        return publicKeyEncryptWithBase64(base64PublicKey, plaintext, "RSA/ECB/NoPadding");
+    }
+
+    /**
+     * 使用指定的公钥进行加密,
+     *
+     * @param base64PublicKey base64表示的公钥字符串
+     * @param plaintext       需要加密的数据
+     * @param cipher          填充方式
+     * @return TheEncryptedData    经加密后的数据 base64
+     */
+    public static String publicKeyEncryptWithBase64(String base64PublicKey, byte[] plaintext, String cipher) throws Exception {
+        PublicKey publicKey = RSA.parsePublicKeyWithBase64(base64PublicKey);
+        return publicKeyEncryptWithBase64(publicKey, plaintext, cipher);
+    }
+
+    /**
+     * 使用指定的公钥进行加密,
+     *
+     * @param publicKey 公钥
+     * @param plaintext 需要加密的数据
+     * @return TheEncryptedData    经加密后的数据 base64
+     */
+    public static String publicKeyEncryptWithBase64(PublicKey publicKey, byte[] plaintext) throws Exception {
+        byte[] ciphertext = publicKeyEncrypt(publicKey, plaintext, "RSA/ECB/NoPadding");
+        return Base64.encodeBase64String(ciphertext);
+    }
+
+    /**
+     * 使用指定的公钥进行加密,
+     *
+     * @param publicKey 公钥
+     * @param plaintext 需要加密的数据
+     * @param cipher    填充方式
+     * @return TheEncryptedData    经加密后的数据 base64
+     */
+    public static String publicKeyEncryptWithBase64(PublicKey publicKey, byte[] plaintext, String cipher) throws Exception {
+        byte[] ciphertext = publicKeyEncrypt(publicKey, plaintext, cipher);
+        return Base64.encodeBase64String(ciphertext);
+    }
+
+    /**
+     * 公钥加密,使用填充方式RSA/ECB/NoPadding
+     *
+     * @param publicKey 公钥
+     * @param plaintext 明文
+     * @return 加密后的数据
+     * @throws Exception 加密发生异常
+     */
+    public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext) throws Exception {
+        return publicKeyEncrypt(publicKey, plaintext, "RSA/ECB/NoPadding");
+    }
+
+    /**
+     * 公钥加密
+     *
+     * @param publicKey 公钥
+     * @param plaintext 待加密的数据(明文)
+     * @param cipherStr cipher
+     * @return 加密后的数据
+     */
+    public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext, String cipherStr) throws Exception {
+        Cipher cipher = Cipher.getInstance(cipherStr);
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            for (int offset = 0; offset < plaintext.length; offset += PK_BLOCK_SIZE) {
+                int inputLen = plaintext.length - offset;
+                if (inputLen > PK_BLOCK_SIZE) {
+                    inputLen = PK_BLOCK_SIZE;
+                }
+
+                byte[] encryptedBlock = cipher.doFinal(plaintext, offset, inputLen);
+                outputStream.write(encryptedBlock);
+            }
+
+            return outputStream.toByteArray();
+        } catch (IllegalBlockSizeException e) {
+            throw new Exception("加密块大小不合法", e);
+        } catch (BadPaddingException e) {
+            throw new Exception("错误填充模式", e);
+        } catch (IOException e) {
+            throw new Exception("字节输出流异常", e);
+        }
     }
 
 }
