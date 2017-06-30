@@ -7,14 +7,27 @@ import sun.security.util.DerValue;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.*;
 
 public class RSA {
 
+    public static Key generateKey() throws NoSuchAlgorithmException {
+        return generateKey(2048);
+    }
+
+    public static Key generateKey(int keySize) throws NoSuchAlgorithmException {
+        return generateKey("RSA", keySize);
+    }
+
+    public static Key generateKey(String algorithm, int keySize) throws NoSuchAlgorithmException {
+        KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(algorithm);
+        keyGenerator.initialize(keySize);
+        KeyPair keyPair = keyGenerator.generateKeyPair();
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+        return new Key(publicKey, privateKey);
+    }
 
     /**
      * 根据给定的16进制系数和专用指数字符串构造一个RSA专用的公钥对象，并生成公钥。
@@ -285,4 +298,38 @@ public class RSA {
         return new int[]{index, length};
     }
 
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+        Key key = generateKey(512);
+        System.out.println(Base64.encodeBase64String(key.getPublicKey().getEncoded()));
+        System.out.println(Base64.encodeBase64String(key.getPrivateKey().getEncoded()));
+    }
+
+    public static class Key {
+        private PublicKey publicKey;
+        private PrivateKey privateKey;
+
+        public Key() {
+        }
+
+        public Key(PublicKey publicKey, PrivateKey privateKey) {
+            this.publicKey = publicKey;
+            this.privateKey = privateKey;
+        }
+
+        public PublicKey getPublicKey() {
+            return publicKey;
+        }
+
+        public void setPublicKey(PublicKey publicKey) {
+            this.publicKey = publicKey;
+        }
+
+        public PrivateKey getPrivateKey() {
+            return privateKey;
+        }
+
+        public void setPrivateKey(PrivateKey privateKey) {
+            this.privateKey = privateKey;
+        }
+    }
 }
