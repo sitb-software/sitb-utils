@@ -65,7 +65,32 @@ public class RSAUtil {
         return c.doFinal(data);
     }
 
-    public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, Cipher cipher) throws Exception {
+    /**
+     * 私钥解密
+     *
+     * @param privateKeyBase64 私钥
+     * @param encrypted        密文
+     * @return 解密后的数据
+     */
+    public static String privateKeyDecryptWithBase64(String privateKeyBase64, byte[] encrypted) throws Exception {
+        return privateKeyDecryptWithBase64(privateKeyBase64, encrypted, "RSA/ECB/NoPadding");
+    }
+
+    /**
+     * 私钥解密
+     *
+     * @param privateKeyBase64 私钥
+     * @param encrypted        密文
+     * @param cipher           填充方式
+     * @return 解密后的数据
+     */
+    public static String privateKeyDecryptWithBase64(String privateKeyBase64, byte[] encrypted, String cipher) throws Exception {
+        PrivateKey privateKey = RSA.parsePrivateKeyWithBase64(privateKeyBase64);
+        return Base64.encodeBase64String(privateKeyDecrypt(privateKey, encrypted, cipher));
+    }
+
+    public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, String cipherStr) throws Exception {
+        Cipher cipher = Cipher.getInstance(cipherStr);
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
         try {
