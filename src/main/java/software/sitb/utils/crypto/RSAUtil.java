@@ -20,6 +20,9 @@ import java.security.spec.InvalidKeySpecException;
  */
 public class RSAUtil {
 
+    public static final String DEFAULT_CIPHER = "RSA/ECB/PKCS1Padding";
+
+
     public static final int PK_BLOCK_SIZE = 53;
 
     public static final int PRK_BLOCK_SIZE = 64;
@@ -33,7 +36,7 @@ public class RSAUtil {
      * @throws Exception 解密失败
      */
     public static String privateKeyDecryptWithHex(String hexPrivateKey, byte[] ciphertext) throws Exception {
-        byte[] result = privateKeyDecryptWithDer(hexPrivateKey, ciphertext, "RSA/ECB/NoPadding");
+        byte[] result = privateKeyDecryptWithDer(hexPrivateKey, ciphertext, DEFAULT_CIPHER);
         return CodecUtils.hexString(result);
     }
 
@@ -73,7 +76,7 @@ public class RSAUtil {
      * @return 解密后的数据
      */
     public static String privateKeyDecryptWithBase64(String privateKeyBase64, byte[] encrypted) throws Exception {
-        return privateKeyDecryptWithBase64(privateKeyBase64, encrypted, "RSA/ECB/NoPadding");
+        return privateKeyDecryptWithBase64(privateKeyBase64, encrypted, DEFAULT_CIPHER);
     }
 
     /**
@@ -124,7 +127,7 @@ public class RSAUtil {
      * @return TheEncryptedData    经加密后的数据 十六进制表示
      */
     public static String publicKeyEncryptWithHex(String hexPublicKey, byte[] plaintext) throws Exception {
-        return publicKeyEncryptWithHex(hexPublicKey, plaintext, "RSA/ECB/NoPadding");
+        return publicKeyEncryptWithHex(hexPublicKey, plaintext, DEFAULT_CIPHER);
     }
 
     /**
@@ -153,7 +156,7 @@ public class RSAUtil {
      * @return TheEncryptedData    经加密后的数据 十六进制表示
      */
     public static String publicKeyEncryptWithHex(PublicKey publicKey, byte[] plaintext) throws Exception {
-        return publicKeyEncryptWithHex(publicKey, plaintext, "RSA/ECB/NoPadding");
+        return publicKeyEncryptWithHex(publicKey, plaintext, DEFAULT_CIPHER);
     }
 
     /**
@@ -178,7 +181,7 @@ public class RSAUtil {
      * @return TheEncryptedData    经加密后的数据 base64
      */
     public static String publicKeyEncryptWithBase64(String base64PublicKey, byte[] plaintext) throws Exception {
-        return publicKeyEncryptWithBase64(base64PublicKey, plaintext, "RSA/ECB/NoPadding");
+        return publicKeyEncryptWithBase64(base64PublicKey, plaintext, DEFAULT_CIPHER);
     }
 
     /**
@@ -202,7 +205,7 @@ public class RSAUtil {
      * @return TheEncryptedData    经加密后的数据 base64
      */
     public static String publicKeyEncryptWithBase64(PublicKey publicKey, byte[] plaintext) throws Exception {
-        byte[] ciphertext = publicKeyEncrypt(publicKey, plaintext, "RSA/ECB/NoPadding");
+        byte[] ciphertext = publicKeyEncrypt(publicKey, plaintext, DEFAULT_CIPHER);
         return Base64.encodeBase64String(ciphertext);
     }
 
@@ -228,7 +231,7 @@ public class RSAUtil {
      * @throws Exception 加密发生异常
      */
     public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext) throws Exception {
-        return publicKeyEncrypt(publicKey, plaintext, "RSA/ECB/NoPadding");
+        return publicKeyEncrypt(publicKey, plaintext, DEFAULT_CIPHER);
     }
 
     /**
