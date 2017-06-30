@@ -12,12 +12,14 @@ import java.security.spec.*;
 
 public class RSA {
 
+    private static final String DEFAULT_ALGORITHM = "RSA";
+
     public static Key generateKey() throws NoSuchAlgorithmException {
         return generateKey(2048);
     }
 
     public static Key generateKey(int keySize) throws NoSuchAlgorithmException {
-        return generateKey("RSA", keySize);
+        return generateKey(DEFAULT_ALGORITHM, keySize);
     }
 
     public static Key generateKey(String algorithm, int keySize) throws NoSuchAlgorithmException {
@@ -37,7 +39,7 @@ public class RSA {
      * @return RSA公钥。
      */
     public static PublicKey getPublicKey(String hexModulus, String hexPublicExponent) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        return getPublicKey(hexModulus, hexPublicExponent, "RSA");
+        return getPublicKey(hexModulus, hexPublicExponent, DEFAULT_ALGORITHM);
     }
 
     /**
@@ -66,7 +68,7 @@ public class RSA {
      * @return 私钥
      */
     public static PrivateKey getPrivateKey(String hexModulus, String hexExponent) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        return getPrivateKey(hexModulus, hexExponent, "RSA");
+        return getPrivateKey(hexModulus, hexExponent, DEFAULT_ALGORITHM);
     }
 
     /**
@@ -102,7 +104,7 @@ public class RSA {
         BigInteger crtCoefficient = ders[8].getBigInteger();
         RSAPrivateCrtKeySpec rsaPrivateKeySpec = new RSAPrivateCrtKeySpec(modulus, publicExponent, privateExponent, primeP, primeQ, primeExponentP, primeExponentQ, crtCoefficient);
 
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        KeyFactory keyFactory = KeyFactory.getInstance(DEFAULT_ALGORITHM);
         return keyFactory.generatePrivate(rsaPrivateKeySpec);
     }
 
@@ -114,7 +116,7 @@ public class RSA {
      * @throws Exception 发生异常
      */
     public static PublicKey readPemPublicKey(InputStream inputStream) throws Exception {
-        return readPemPublicKey(inputStream, "RSA");
+        return readPemPublicKey(inputStream, DEFAULT_ALGORITHM);
     }
 
     /**
@@ -166,7 +168,7 @@ public class RSA {
      * @throws Exception 读取失败
      */
     public static PrivateKey readPemPrivateKey(InputStream inputStream) throws Exception {
-        return readPemPrivateKey(inputStream, "RSA");
+        return readPemPrivateKey(inputStream, DEFAULT_ALGORITHM);
     }
 
     /**
@@ -220,7 +222,7 @@ public class RSA {
      * @throws NoSuchAlgorithmException NoSuchAlgorithmException
      */
     public static PublicKey parsePublicKeyWithHex(String hexPublicKey) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        return parsePublicKeyWithHex(hexPublicKey, "RSA");
+        return parsePublicKeyWithHex(hexPublicKey, DEFAULT_ALGORITHM);
     }
 
     /**
@@ -245,7 +247,7 @@ public class RSA {
      * @return 公钥
      */
     public static PublicKey parsePublicKeyWithBase64(String base64PublicKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        return parsePublicKeyWithBase64(base64PublicKey, "RSA");
+        return parsePublicKeyWithBase64(base64PublicKey, DEFAULT_ALGORITHM);
     }
 
     /**
@@ -268,7 +270,7 @@ public class RSA {
      * @return 私钥
      */
     public static PrivateKey parsePrivateKeyWithBase64(String base64PrivateKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        return parsePrivateKeyWithBase64(base64PrivateKey, "RSA");
+        return parsePrivateKeyWithBase64(base64PrivateKey, DEFAULT_ALGORITHM);
     }
 
     /**
