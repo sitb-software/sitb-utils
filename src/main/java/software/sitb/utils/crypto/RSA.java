@@ -248,6 +248,29 @@ public class RSA {
         return keyFactory.generatePublic(pubX509);
     }
 
+    /**
+     * 从 base64字符串中解析私钥
+     *
+     * @param base64PrivateKey 私钥
+     * @return 私钥
+     */
+    public static PrivateKey parsePrivateKeyWithBase64(String base64PrivateKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        return parsePrivateKeyWithBase64(base64PrivateKey, "RSA");
+    }
+
+    /**
+     * 从 base64字符串中解析私钥
+     *
+     * @param base64PrivateKey 私钥
+     * @param algorithm        the name of the requested key algorithm.
+     * @return 私钥
+     */
+    public static PrivateKey parsePrivateKeyWithBase64(String base64PrivateKey, String algorithm) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        PKCS8EncodedKeySpec pubX509 = new PKCS8EncodedKeySpec(Base64.decodeBase64(base64PrivateKey));
+        KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+        return keyFactory.generatePrivate(pubX509);
+    }
+
     private static int[] calLength(String[] bytes, int index, int length) {
         if (length > 128) {
             int i = length - 128;
