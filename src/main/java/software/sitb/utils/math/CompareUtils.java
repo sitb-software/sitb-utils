@@ -3,8 +3,6 @@ package software.sitb.utils.math;
 import software.sitb.utils.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.Objects;
 
 /**
  * 比较工具
@@ -179,19 +177,31 @@ public class CompareUtils {
     public static boolean ge(String left, String right) {
         BigDecimal leftBigDec = getBigDecimal(left);
         BigDecimal rightBigDec = getBigDecimal(right);
-        return leftBigDec.compareTo(rightBigDec) >= 0;
+        return ge(leftBigDec, rightBigDec);
+    }
+
+    public static boolean ge(BigDecimal left, BigDecimal right) {
+        return left.compareTo(right) >= 0;
     }
 
     public static boolean lt(String left, String right) {
         BigDecimal leftBigDec = getBigDecimal(left);
         BigDecimal rightBigDec = getBigDecimal(right);
-        return leftBigDec.compareTo(rightBigDec) < 0;
+        return lt(leftBigDec, rightBigDec);
+    }
+
+    public static boolean lt(BigDecimal left, BigDecimal right) {
+        return left.compareTo(right) < 0;
     }
 
     public static boolean le(String left, String right) {
         BigDecimal leftBigDec = getBigDecimal(left);
         BigDecimal rightBigDec = getBigDecimal(right);
-        return leftBigDec.compareTo(rightBigDec) <= 0;
+        return le(leftBigDec, rightBigDec);
+    }
+
+    public static boolean le(BigDecimal left, BigDecimal right) {
+        return left.compareTo(right) <= 0;
     }
 
     public static boolean equal(String left, String right) {
