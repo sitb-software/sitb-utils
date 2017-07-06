@@ -1,4 +1,4 @@
-ext.repoUrl = "http://repo.sitb.software/repository/maven-public/"
+ext.repoUrl = "https://repo.sitb.software/repository/maven-public/"
 ext.spring_boot = "1.4.2.RELEASE"
 ext.spring_security = "4.1.1.RELEASE"
 ext.spring_data_commons = "1.12.5.RELEASE"
