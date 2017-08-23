@@ -9,10 +9,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 
 /**
@@ -267,4 +264,29 @@ public class RSAUtil {
         }
     }
 
+    /**
+     * 对数据进行签名
+     *
+     * @param privateKeyStr base64 格式的私钥
+     * @param algorithm     签名所用的algorithm
+     * @param data          待签名的数据
+     * @return 签名
+     * @throws InvalidKeySpecException InvalidKeySpecException
+     * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+     * @throws SignatureException SignatureException
+     * @throws InvalidKeyException InvalidKeyException
+     */
+    public static String signWithBase64(String privateKeyStr, String algorithm, String data) throws InvalidKeySpecException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+        byte[] dataBytes = Base64.decodeBase64(data);
+        PrivateKey privateKey = RSA.parsePrivateKeyWithBase64(privateKeyStr);
+        byte[] sign = sign(privateKey, algorithm, dataBytes);
+        return Base64.encodeBase64String(sign);
+    }
+
+    public static byte[] sign(PrivateKey privateKey, String algorithm, byte[] data) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Signature signature = Signature.getInstance(algorithm);
+        signature.initSign(privateKey);
+        signature.update(data);
+        return signature.sign();
+    }
 }
