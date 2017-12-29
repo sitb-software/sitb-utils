@@ -82,6 +82,14 @@ public class Calculator {
         return new BigDecimal(addend).add(new BigDecimal(augend)).longValue();
     }
 
+    public static String add(BigDecimal addend, String augend) {
+        return add(addend, new BigDecimal(augend)).toString();
+    }
+
+    public static String add(String addend, BigDecimal augend) {
+        return add(new BigDecimal(addend), augend).toString();
+    }
+
     /**
      * 加法
      *
@@ -113,9 +121,31 @@ public class Calculator {
         if (StringUtils.isEmpty(minuend)) {
             minuend = "0";
         }
-        BigDecimal tmpSub = new BigDecimal(subtrahend);
-        BigDecimal tmpMin = new BigDecimal(minuend);
-        return tmpSub.subtract(tmpMin).toString();
+        return subtract(new BigDecimal(subtrahend), new BigDecimal(minuend)).toString();
+    }
+
+    public static String subtract(BigDecimal subtrahend, String minuend) {
+        if (StringUtils.isEmpty(minuend)) {
+            minuend = "0";
+        }
+        return subtract(subtrahend, new BigDecimal(minuend)).toString();
+    }
+
+    public static String subtract(String subtrahend, BigDecimal minuend) {
+        if (StringUtils.isEmpty(subtrahend)) {
+            subtrahend = "0";
+        }
+        return subtract(new BigDecimal(subtrahend), minuend).toString();
+    }
+
+    public static BigDecimal subtract(BigDecimal subtrahend, BigDecimal minuend) {
+        if (null == subtrahend) {
+            subtrahend = BigDecimal.ZERO;
+        }
+        if (null == minuend) {
+            minuend = BigDecimal.ZERO;
+        }
+        return subtrahend.subtract(minuend);
     }
 
     /**

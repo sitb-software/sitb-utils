@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * Date Util
  *
- * @author 田尘殇Sean(sean.snow@live.com) createAt 2016/12/16
+ * @author 田尘殇Sean(sean.snow @ live.com) createAt 2016/12/16
  */
 public class DateUtils {
 
@@ -36,6 +36,10 @@ public class DateUtils {
         calendar.set(Calendar.MILLISECOND, 0);
 
         return calendar;
+    }
+
+    public static Calendar dayEndTime() {
+        return dayEndTime(null);
     }
 
     /**

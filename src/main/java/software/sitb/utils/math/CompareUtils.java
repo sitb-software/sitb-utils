@@ -7,10 +7,9 @@ import java.math.BigDecimal;
 /**
  * 比较工具
  *
- * @author 田尘殇Sean(sean.snow@live.com) createAt 2016/12/28
+ * @author 田尘殇Sean(sean.snow @ live.com) createAt 2016/12/28
  */
 public class CompareUtils {
-
 
     /**
      * 比较两个数,判断{@code left} 是否大于 {@code right}
@@ -188,6 +187,14 @@ public class CompareUtils {
         BigDecimal leftBigDec = getBigDecimal(left);
         BigDecimal rightBigDec = getBigDecimal(right);
         return lt(leftBigDec, rightBigDec);
+    }
+
+    public static boolean lt(String left, BigDecimal right) {
+        return lt(getBigDecimal(left), right);
+    }
+
+    public static boolean lt(BigDecimal left, String right) {
+        return lt(left, getBigDecimal(right));
     }
 
     public static boolean lt(BigDecimal left, BigDecimal right) {
