@@ -20,7 +20,13 @@ public class DateUtils {
      * @return 一天的开始时间
      */
     public static Calendar dayStartTime() {
-        return dayStartTime(null);
+        return dayStartTime((Calendar) null);
+    }
+
+    public static Calendar dayStartTime(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return dayEndTime(calendar);
     }
 
     /**
@@ -39,7 +45,13 @@ public class DateUtils {
     }
 
     public static Calendar dayEndTime() {
-        return dayEndTime(null);
+        return dayEndTime((Calendar) null);
+    }
+
+    public static Calendar dayEndTime(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return dayEndTime(calendar);
     }
 
     /**
