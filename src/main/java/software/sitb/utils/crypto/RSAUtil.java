@@ -19,6 +19,11 @@ public class RSAUtil {
 
     public static final String DEFAULT_CIPHER = "RSA/ECB/PKCS1Padding";
 
+    /**
+     * 默认签名算法
+     */
+    public static final String DEFAULT_SIGN_ALGORITHMS = "SHA1WithRSA";
+
 
     public static final int PK_BLOCK_SIZE = 53;
 
@@ -261,6 +266,10 @@ public class RSAUtil {
         }
     }
 
+    public static String signWithBase64(String privateKeyStr, String data) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
+        return signWithBase64(privateKeyStr, DEFAULT_SIGN_ALGORITHMS, data);
+    }
+
     /**
      * 对数据进行签名
      *
@@ -285,5 +294,25 @@ public class RSAUtil {
         signature.initSign(privateKey);
         signature.update(data);
         return signature.sign();
+    }
+
+    public static boolean signVerifyWithBase64(String publicKey, String data, String signature) throws InvalidKeySpecException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+        return signVerifyWithBase64(publicKey, DEFAULT_SIGN_ALGORITHMS, data, signature);
+    }
+
+    public static boolean signVerifyWithBase64(String publicKey, String algorithm, String data, String signature) throws InvalidKeySpecException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+        return signVerify(
+                RSA.parsePublicKeyWithBase64(publicKey),
+                algorithm,
+                Base64.decodeBase64(data),
+                Base64.decodeBase64(signature)
+        );
+    }
+
+    public static boolean signVerify(PublicKey publicKey, String algorithm, byte[] data, byte[] signature) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Signature sign = Signature.getInstance(algorithm);
+        sign.initVerify(publicKey);
+        sign.update(data);
+        return sign.verify(signature);
     }
 }
