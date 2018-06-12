@@ -33,7 +33,7 @@ public class RSAUtil {
      * @throws Exception 解密失败
      */
     public static String privateKeyDecryptWithHex(String hexPrivateKey, byte[] ciphertext) throws Exception {
-        byte[] result = privateKeyDecryptWithDer(hexPrivateKey, ciphertext, DEFAULT_CIPHER);
+        byte[] result = privateKeyDecryptWithDer(hexPrivateKey, ciphertext, Cipher.getInstance(DEFAULT_CIPHER));
         return CodecUtils.hexString(result);
     }
 
@@ -45,7 +45,7 @@ public class RSAUtil {
      * @param cipher        填充方式
      * @return 解密以后的数据
      */
-    public static byte[] privateKeyDecryptWithDer(String hexPrivateKey, byte[] ciphertext, String cipher) throws BadPaddingException, NoSuchAlgorithmException, IOException, IllegalBlockSizeException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException {
+    public static byte[] privateKeyDecryptWithDer(String hexPrivateKey, byte[] ciphertext, Cipher cipher) throws BadPaddingException, NoSuchAlgorithmException, IOException, IllegalBlockSizeException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException {
         return privateKeyDecryptWithDer(hexPrivateKey, 9, ciphertext, cipher);
     }
 
@@ -58,11 +58,10 @@ public class RSAUtil {
      * @param cipher        填充方式
      * @return 解密以后的数据
      */
-    public static byte[] privateKeyDecryptWithDer(String privateKeyStr, int sequence, byte[] data, String cipher) throws NoSuchAlgorithmException, IOException, InvalidKeySpecException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchPaddingException {
+    public static byte[] privateKeyDecryptWithDer(String privateKeyStr, int sequence, byte[] data, Cipher cipher) throws NoSuchAlgorithmException, IOException, InvalidKeySpecException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchPaddingException {
         PrivateKey privateKey = RSA.getPrivateKey(privateKeyStr, sequence);
-        Cipher c = Cipher.getInstance(cipher);
-        c.init(Cipher.DECRYPT_MODE, privateKey);
-        return c.doFinal(data);
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        return cipher.doFinal(data);
     }
 
     /**
@@ -73,7 +72,7 @@ public class RSAUtil {
      * @return 解密后的数据
      */
     public static String privateKeyDecryptWithBase64(String privateKeyBase64, byte[] encrypted) throws Exception {
-        return privateKeyDecryptWithBase64(privateKeyBase64, encrypted, DEFAULT_CIPHER);
+        return privateKeyDecryptWithBase64(privateKeyBase64, encrypted, Cipher.getInstance(DEFAULT_CIPHER));
     }
 
     /**
@@ -84,13 +83,12 @@ public class RSAUtil {
      * @param cipher           填充方式
      * @return 解密后的数据
      */
-    public static String privateKeyDecryptWithBase64(String privateKeyBase64, byte[] encrypted, String cipher) throws Exception {
+    public static String privateKeyDecryptWithBase64(String privateKeyBase64, byte[] encrypted, Cipher cipher) throws Exception {
         PrivateKey privateKey = RSA.parsePrivateKeyWithBase64(privateKeyBase64);
         return Base64.encodeBase64String(privateKeyDecrypt(privateKey, encrypted, cipher));
     }
 
-    public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, String cipherStr) throws Exception {
-        Cipher cipher = Cipher.getInstance(cipherStr);
+    public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, Cipher cipher) throws Exception {
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
         try {
@@ -124,7 +122,7 @@ public class RSAUtil {
      * @return TheEncryptedData    经加密后的数据 十六进制表示
      */
     public static String publicKeyEncryptWithHex(String hexPublicKey, byte[] plaintext) throws Exception {
-        return publicKeyEncryptWithHex(hexPublicKey, plaintext, DEFAULT_CIPHER);
+        return publicKeyEncryptWithHex(hexPublicKey, plaintext, Cipher.getInstance(DEFAULT_CIPHER));
     }
 
     /**
@@ -138,7 +136,7 @@ public class RSAUtil {
      * @param hexPublicKey 十六进制表示DER编码的公钥字符串
      * @return TheEncryptedData    经加密后的数据 十六进制表示
      */
-    public static String publicKeyEncryptWithHex(String hexPublicKey, byte[] plaintext, String cipher) throws Exception {
+    public static String publicKeyEncryptWithHex(String hexPublicKey, byte[] plaintext, Cipher cipher) throws Exception {
         PublicKey publicKey = RSA.parsePublicKeyWithHex(hexPublicKey);
         byte[] cipherData = publicKeyEncrypt(publicKey, plaintext, cipher);
         return CodecUtils.hexString(cipherData);
@@ -153,7 +151,7 @@ public class RSAUtil {
      * @return TheEncryptedData    经加密后的数据 十六进制表示
      */
     public static String publicKeyEncryptWithHex(PublicKey publicKey, byte[] plaintext) throws Exception {
-        return publicKeyEncryptWithHex(publicKey, plaintext, DEFAULT_CIPHER);
+        return publicKeyEncryptWithHex(publicKey, plaintext, Cipher.getInstance(DEFAULT_CIPHER));
     }
 
     /**
@@ -164,7 +162,7 @@ public class RSAUtil {
      * @param cipher    cipher
      * @return TheEncryptedData    经加密后的数据 十六进制表示
      */
-    public static String publicKeyEncryptWithHex(PublicKey publicKey, byte[] plaintext, String cipher) throws Exception {
+    public static String publicKeyEncryptWithHex(PublicKey publicKey, byte[] plaintext, Cipher cipher) throws Exception {
         byte[] cipherData = publicKeyEncrypt(publicKey, plaintext, cipher);
         return CodecUtils.hexString(cipherData);
     }
@@ -178,7 +176,7 @@ public class RSAUtil {
      * @return TheEncryptedData    经加密后的数据 base64
      */
     public static String publicKeyEncryptWithBase64(String base64PublicKey, byte[] plaintext) throws Exception {
-        return publicKeyEncryptWithBase64(base64PublicKey, plaintext, DEFAULT_CIPHER);
+        return publicKeyEncryptWithBase64(base64PublicKey, plaintext, Cipher.getInstance(DEFAULT_CIPHER));
     }
 
     /**
@@ -189,7 +187,7 @@ public class RSAUtil {
      * @param cipher          填充方式
      * @return TheEncryptedData    经加密后的数据 base64
      */
-    public static String publicKeyEncryptWithBase64(String base64PublicKey, byte[] plaintext, String cipher) throws Exception {
+    public static String publicKeyEncryptWithBase64(String base64PublicKey, byte[] plaintext, Cipher cipher) throws Exception {
         PublicKey publicKey = RSA.parsePublicKeyWithBase64(base64PublicKey);
         return publicKeyEncryptWithBase64(publicKey, plaintext, cipher);
     }
@@ -202,7 +200,7 @@ public class RSAUtil {
      * @return TheEncryptedData    经加密后的数据 base64
      */
     public static String publicKeyEncryptWithBase64(PublicKey publicKey, byte[] plaintext) throws Exception {
-        byte[] ciphertext = publicKeyEncrypt(publicKey, plaintext, DEFAULT_CIPHER);
+        byte[] ciphertext = publicKeyEncrypt(publicKey, plaintext, Cipher.getInstance(DEFAULT_CIPHER));
         return Base64.encodeBase64String(ciphertext);
     }
 
@@ -214,7 +212,7 @@ public class RSAUtil {
      * @param cipher    填充方式
      * @return TheEncryptedData    经加密后的数据 base64
      */
-    public static String publicKeyEncryptWithBase64(PublicKey publicKey, byte[] plaintext, String cipher) throws Exception {
+    public static String publicKeyEncryptWithBase64(PublicKey publicKey, byte[] plaintext, Cipher cipher) throws Exception {
         byte[] ciphertext = publicKeyEncrypt(publicKey, plaintext, cipher);
         return Base64.encodeBase64String(ciphertext);
     }
@@ -228,7 +226,7 @@ public class RSAUtil {
      * @throws Exception 加密发生异常
      */
     public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext) throws Exception {
-        return publicKeyEncrypt(publicKey, plaintext, DEFAULT_CIPHER);
+        return publicKeyEncrypt(publicKey, plaintext, Cipher.getInstance(DEFAULT_CIPHER));
     }
 
     /**
@@ -236,11 +234,10 @@ public class RSAUtil {
      *
      * @param publicKey 公钥
      * @param plaintext 待加密的数据(明文)
-     * @param cipherStr cipher
+     * @param cipher    cipher
      * @return 加密后的数据
      */
-    public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext, String cipherStr) throws Exception {
-        Cipher cipher = Cipher.getInstance(cipherStr);
+    public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext, Cipher cipher) throws Exception {
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -271,10 +268,10 @@ public class RSAUtil {
      * @param algorithm     签名所用的algorithm
      * @param data          待签名的数据
      * @return 签名
-     * @throws InvalidKeySpecException InvalidKeySpecException
+     * @throws InvalidKeySpecException  InvalidKeySpecException
      * @throws NoSuchAlgorithmException NoSuchAlgorithmException
-     * @throws SignatureException SignatureException
-     * @throws InvalidKeyException InvalidKeyException
+     * @throws SignatureException       SignatureException
+     * @throws InvalidKeyException      InvalidKeyException
      */
     public static String signWithBase64(String privateKeyStr, String algorithm, String data) throws InvalidKeySpecException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         byte[] dataBytes = Base64.decodeBase64(data);
