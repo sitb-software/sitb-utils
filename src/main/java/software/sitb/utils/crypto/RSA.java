@@ -300,12 +300,6 @@ public class RSA {
         return new int[]{index, length};
     }
 
-    public static void main(String[] args) throws NoSuchAlgorithmException {
-        Key key = generateKey(512);
-        System.out.println(Base64.encodeBase64String(key.getPublicKey().getEncoded()));
-        System.out.println(Base64.encodeBase64String(key.getPrivateKey().getEncoded()));
-    }
-
     public static class Key {
         private PublicKey publicKey;
         private PrivateKey privateKey;
