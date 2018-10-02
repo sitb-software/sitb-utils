@@ -1,32 +1,28 @@
-group 'software.sitb'
-version '1.0.15.RELEASE'
+plugins {
+    id "io.franzbecker.gradle-lombok" version "1.14"
+}
 
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'maven-publish'
-apply from: 'base.gradle'
-apply from: 'libraries.gradle'
-apply from: 'provided.gradle'
-apply from: 'optional.gradle'
+apply from: 'https://onegit.app/enterprise/public/raw/master/libraries.gradle'
+apply from: 'https://onegit.app/enterprise/public/raw/master/java.gradle'
+apply from: 'https://onegit.app/enterprise/public/raw/master/idea.gradle'
+apply from: 'https://onegit.app/enterprise/public/raw/master/wrapper.gradle'
+apply from: 'https://onegit.app/enterprise/public/raw/master/publishing-with-source.gradle'
+
+group 'software.sitb'
+version '1.0.16.RELEASE'
 
 repositories {
-    maven { url "${repoUrl}" }
+    maven { url "${project.'owner.repo'}" }
+    maven { url "${project.'repo'}" }
+    jcenter()
 }
-
 
 dependencies {
-    provided lib.protostuff
-    provided lib.objenesis
-    provided lib.json
-    provided lib.xml
-    provided lib.commons_codec
+    compileOnly lib.protostuff
+    compileOnly lib.objenesis
+    compileOnly lib.json
+    compileOnly lib.xml
+    compileOnly lib.commons_codec
+    compileOnly lib.okhttp3
     testCompile lib._test
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
 }
