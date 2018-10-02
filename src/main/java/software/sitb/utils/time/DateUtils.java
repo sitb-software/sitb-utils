@@ -26,7 +26,7 @@ public class DateUtils {
     public static Calendar dayStartTime(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        return dayEndTime(calendar);
+        return dayStartTime(calendar);
     }
 
     /**
