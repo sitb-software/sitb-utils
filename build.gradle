@@ -9,7 +9,7 @@ apply from: 'https://onegit.app/enterprise/public/raw/master/wrapper.gradle'
 apply from: 'https://onegit.app/enterprise/public/raw/master/publishing-with-source.gradle'
 
 group 'software.sitb'
-version '1.0.16.RELEASE'
+version '1.0.17.RELEASE'
 
 repositories {
     maven { url "${project.'owner.repo'}" }
@@ -24,5 +24,7 @@ dependencies {
     compileOnly lib.xml
     compileOnly lib.commons_codec
     compileOnly lib.okhttp3
+    compileOnly lib.netty_all
+    compileOnly lib.slf4j_api
     testCompile lib._test
 }
