@@ -157,13 +157,16 @@ public class CompareUtils {
      *
      * @param left  左边的比较数
      * @param right 右边的被比较数
-     * @return 如果{@code left} 大于 {@code right} 返回 {@code true}
+     * @return 如果 {@code left} 大于 {@code right} 返回 {@code true}
      */
     public static boolean gt(String left, Double right) {
         BigDecimal leftBigDec = getBigDecimal(left);
         BigDecimal rightBigDec = new BigDecimal(right);
+        return gt(leftBigDec, rightBigDec);
+    }
 
-        return leftBigDec.compareTo(rightBigDec) > 0;
+    public static boolean gt(BigDecimal left, BigDecimal right) {
+        return left.compareTo(right) > 0;
     }
 
     /**
