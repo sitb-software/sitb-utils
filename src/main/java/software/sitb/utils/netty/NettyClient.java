@@ -5,7 +5,6 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import java.util.List;
  * @author 田尘殇Sean Create At 2018/10/15 11:03
  */
 @Slf4j
-@ChannelHandler.Sharable
 public class NettyClient extends ChannelInboundHandlerAdapter {
 
 
@@ -31,9 +29,15 @@ public class NettyClient extends ChannelInboundHandlerAdapter {
 
     private Exception cause;
 
-    private NettyClient(String host, int port, ChannelHandler[] channelHandlers) {
+    private ChannelReadHandle channelReadHandle;
+
+    private NettyClient(String host, int port, ChannelHandler[] channelHandlers, ChannelReadHandle channelReadHandle) {
         this.host = host;
         this.port = port;
+        if (null == channelReadHandle) {
+            this.channelReadHandle = new ChannelReadHandle() {
+            };
+        }
         EventLoopGroup group = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(group).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
@@ -69,9 +73,13 @@ public class NettyClient extends ChannelInboundHandlerAdapter {
     @Override
     @SuppressWarnings("unchecked")
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        LOGGER.info("receive data -> [{}]", msg);
-        response = msg;
+        response = this.channelReadHandle.read(response, ctx, msg);
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         LOGGER.info("read complete. close channel.");
+        ctx.close();
     }
 
     @Override
@@ -81,6 +89,23 @@ public class NettyClient extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
+    public interface ChannelReadHandle {
+
+        /**
+         * 从channel读取数据
+         *
+         * @param buffer 上一次读取的数据
+         * @param ctx    ctx
+         * @param msg    本次需要读取的
+         * @return 读取完整的数据
+         */
+        default Object read(Object buffer, ChannelHandlerContext ctx, Object msg) {
+            LOGGER.info("receive data -> [{}]", msg);
+            return msg;
+        }
+
+    }
+
     public static class Builder {
 
         private String host;
@@ -88,6 +113,8 @@ public class NettyClient extends ChannelInboundHandlerAdapter {
         private int port;
 
         private List<ChannelHandler> handlers = new ArrayList<>(3);
+
+        private ChannelReadHandle channelReadHandle;
 
         public Builder host(String host) {
             this.host = host;
@@ -99,13 +126,22 @@ public class NettyClient extends ChannelInboundHandlerAdapter {
             return this;
         }
 
+        public Builder channelRead(ChannelReadHandle readHandle) {
+            this.channelReadHandle = readHandle;
+            return this;
+        }
+
         public Builder addHandler(ChannelHandler channelHandler) {
             this.handlers.add(channelHandler);
             return this;
         }
 
         public NettyClient build() {
-            return new NettyClient(host, port, handlers.toArray(new ChannelHandler[0]));
+            return new NettyClient(host,
+                    port,
+                    handlers.toArray(new ChannelHandler[0]),
+                    channelReadHandle
+            );
         }
     }
 }
