@@ -40,7 +40,7 @@ public class NettyClient extends ChannelInboundHandlerAdapter {
             @Override
             public void initChannel(SocketChannel channel) throws Exception {
                 channel.pipeline().addLast(channelHandlers);
-                channel.pipeline().addLast();
+                channel.pipeline().addLast(NettyClient.this);
             }
         }).option(ChannelOption.SO_KEEPALIVE, true);
     }
