@@ -18,5 +18,6 @@ public class NettyClientTest {
                 .build();
 
         System.out.println((String) client.send("GET /api/v1"));
+        System.out.println((String) client.send("GET /api/v1"));
     }
 }

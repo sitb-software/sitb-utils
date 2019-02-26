@@ -14,6 +14,7 @@ import java.util.List;
  * @author 田尘殇Sean Create At 2018/10/15 11:03
  */
 @Slf4j
+@ChannelHandler.Sharable
 public class NettyClient extends ChannelInboundHandlerAdapter {
 
 
@@ -31,6 +32,14 @@ public class NettyClient extends ChannelInboundHandlerAdapter {
 
     private ChannelReadHandle channelReadHandle;
 
+    public NettyClient(String host, int port) {
+        this(host, port, null);
+    }
+
+    public NettyClient(String host, int port, ChannelHandler[] channelHandlers) {
+        this(host, port, channelHandlers, null);
+    }
+
     private NettyClient(String host, int port, ChannelHandler[] channelHandlers, ChannelReadHandle channelReadHandle) {
         this.host = host;
         this.port = port;
@@ -43,7 +52,9 @@ public class NettyClient extends ChannelInboundHandlerAdapter {
         bootstrap.group(group).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
             @Override
             public void initChannel(SocketChannel channel) throws Exception {
-                channel.pipeline().addLast(channelHandlers);
+                if (null != channelHandlers) {
+                    channel.pipeline().addLast(channelHandlers);
+                }
                 channel.pipeline().addLast(NettyClient.this);
             }
         }).option(ChannelOption.SO_KEEPALIVE, true);
