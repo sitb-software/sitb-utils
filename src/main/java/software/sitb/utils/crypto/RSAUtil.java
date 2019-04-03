@@ -105,6 +105,10 @@ public class RSAUtil {
         return privateKeyDecrypt(privateKey, encrypted, Cipher.getInstance(DEFAULT_CIPHER));
     }
 
+    public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, int blockSize) throws Exception {
+        return privateKeyDecrypt(privateKey, encrypted, Cipher.getInstance(DEFAULT_CIPHER), blockSize);
+    }
+
     public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, Cipher cipher) throws Exception {
         return privateKeyDecrypt(privateKey, encrypted, cipher, DEFAULT_PRK_BLOCK_SIZE);
     }
@@ -252,6 +256,10 @@ public class RSAUtil {
 
     public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext, Cipher cipher) throws Exception {
         return publicKeyEncrypt(publicKey, plaintext, cipher, DEFAULT_PK_BLOCK_SIZE);
+    }
+
+    public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext, int blockSize) throws Exception {
+        return publicKeyEncrypt(publicKey, plaintext, Cipher.getInstance(DEFAULT_CIPHER), blockSize);
     }
 
     /**
