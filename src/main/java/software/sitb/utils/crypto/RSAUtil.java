@@ -93,6 +93,18 @@ public class RSAUtil {
         return Base64.encodeBase64String(privateKeyDecrypt(privateKey, encrypted, cipher));
     }
 
+    /**
+     * 私钥解密 使用默认的解密算法进行解密<code>RSA/ECB/PKCS1Padding</code>
+     *
+     * @param privateKey 私钥
+     * @param encrypted  加密的数据
+     * @return 明文
+     * @throws Exception 解密失败
+     */
+    public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted) throws Exception {
+        return privateKeyDecrypt(privateKey, encrypted, Cipher.getInstance(DEFAULT_CIPHER));
+    }
+
     public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, Cipher cipher) throws Exception {
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
