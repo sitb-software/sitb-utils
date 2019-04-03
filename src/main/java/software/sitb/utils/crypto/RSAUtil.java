@@ -25,9 +25,9 @@ public class RSAUtil {
     public static final String DEFAULT_SIGN_ALGORITHMS = "SHA1WithRSA";
 
 
-    public static final int PK_BLOCK_SIZE = 53;
+    public static final int DEFAULT_PK_BLOCK_SIZE = 53;
 
-    public static final int PRK_BLOCK_SIZE = 64;
+    public static final int DEFAULT_PRK_BLOCK_SIZE = 64;
 
     /**
      * 使用私钥解密
@@ -106,14 +106,18 @@ public class RSAUtil {
     }
 
     public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, Cipher cipher) throws Exception {
+        return privateKeyDecrypt(privateKey, encrypted, cipher, DEFAULT_PRK_BLOCK_SIZE);
+    }
+
+    public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, Cipher cipher, int blockSize) throws Exception {
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            for (int offset = 0; offset < encrypted.length; offset += PRK_BLOCK_SIZE) {
+            for (int offset = 0; offset < encrypted.length; offset += blockSize) {
                 int inputLen = encrypted.length - offset;
-                if (inputLen > PRK_BLOCK_SIZE) {
-                    inputLen = PRK_BLOCK_SIZE;
+                if (inputLen > blockSize) {
+                    inputLen = blockSize;
                 }
 
                 byte[] decryptedBlock = cipher.doFinal(encrypted, offset, inputLen);
@@ -246,6 +250,10 @@ public class RSAUtil {
         return publicKeyEncrypt(publicKey, plaintext, Cipher.getInstance(DEFAULT_CIPHER));
     }
 
+    public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext, Cipher cipher) throws Exception {
+        return publicKeyEncrypt(publicKey, plaintext, cipher, DEFAULT_PK_BLOCK_SIZE);
+    }
+
     /**
      * 公钥加密
      *
@@ -254,20 +262,19 @@ public class RSAUtil {
      * @param cipher    cipher
      * @return 加密后的数据
      */
-    public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext, Cipher cipher) throws Exception {
+    public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext, Cipher cipher, int blockSize) throws Exception {
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            for (int offset = 0; offset < plaintext.length; offset += PK_BLOCK_SIZE) {
+            for (int offset = 0; offset < plaintext.length; offset += blockSize) {
                 int inputLen = plaintext.length - offset;
-                if (inputLen > PK_BLOCK_SIZE) {
-                    inputLen = PK_BLOCK_SIZE;
+                if (inputLen > blockSize) {
+                    inputLen = blockSize;
                 }
 
                 byte[] encryptedBlock = cipher.doFinal(plaintext, offset, inputLen);
                 outputStream.write(encryptedBlock);
             }
-
             return outputStream.toByteArray();
         } catch (IllegalBlockSizeException e) {
             throw new Exception("加密块大小不合法", e);
