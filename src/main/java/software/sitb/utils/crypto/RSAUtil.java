@@ -293,7 +293,7 @@ public class RSAUtil {
         }
     }
 
-    public static String signWithBase64(String privateKeyStr, String data) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
+    public static String signWithBase64(String privateKeyStr, byte[] data) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
         return signWithBase64(privateKeyStr, DEFAULT_SIGN_ALGORITHMS, data);
     }
 
@@ -309,10 +309,9 @@ public class RSAUtil {
      * @throws SignatureException       SignatureException
      * @throws InvalidKeyException      InvalidKeyException
      */
-    public static String signWithBase64(String privateKeyStr, String algorithm, String data) throws InvalidKeySpecException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
-        byte[] dataBytes = Base64.decodeBase64(data);
+    public static String signWithBase64(String privateKeyStr, String algorithm, byte[] data) throws InvalidKeySpecException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         PrivateKey privateKey = RSA.parsePrivateKeyWithBase64(privateKeyStr);
-        byte[] sign = sign(privateKey, algorithm, dataBytes);
+        byte[] sign = sign(privateKey, algorithm, data);
         return Base64.encodeBase64String(sign);
     }
 
