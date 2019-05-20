@@ -322,15 +322,15 @@ public class RSAUtil {
         return signature.sign();
     }
 
-    public static boolean signVerifyWithBase64(String publicKey, String data, String signature) throws InvalidKeySpecException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+    public static boolean signVerifyWithBase64(String publicKey, byte[] data, String signature) throws InvalidKeySpecException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         return signVerifyWithBase64(publicKey, DEFAULT_SIGN_ALGORITHMS, data, signature);
     }
 
-    public static boolean signVerifyWithBase64(String publicKey, String algorithm, String data, String signature) throws InvalidKeySpecException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+    public static boolean signVerifyWithBase64(String publicKey, String algorithm, byte[] data, String signature) throws InvalidKeySpecException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         return signVerify(
                 RSA.parsePublicKeyWithBase64(publicKey),
                 algorithm,
-                Base64.decodeBase64(data),
+                data,
                 Base64.decodeBase64(signature)
         );
     }
