@@ -25,6 +25,45 @@ public class DesUtils {
 
     public static final String DES = "DES";
 
+    public static String encryptWithHex(byte[] key, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+        return encryptWithHex(DEFAULT_CIPHER, key, data);
+    }
+
+    public static String encryptWithHex(String cipher, byte[] key, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+        return encryptWithHex(Cipher.getInstance(cipher), key, data);
+    }
+
+    public static String encryptWithHex(Cipher cipher, byte[] key, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+        byte[] result = encrypt(cipher, key, data);
+        return CodecUtils.hexString(result);
+    }
+
+    public static String encryptWithHex(String hexKey, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+        return encryptWithHex(DEFAULT_CIPHER, hexKey, data);
+    }
+
+    public static String encryptWithHex(String cipher, String hexKey, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+        return encryptWithHex(Cipher.getInstance(cipher), hexKey, data);
+    }
+
+    public static String encryptWithHex(Cipher cipher, String hexKey, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+        byte[] result = encrypt(cipher, CodecUtils.hex2byte(hexKey), data);
+        return CodecUtils.hexString(result);
+    }
+
+    public static String encryptWithBase64(byte[] key, byte[] data) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
+        return encryptWithBase64(DEFAULT_CIPHER, key, data);
+    }
+
+    public static String encryptWithBase64(String cipher, byte[] key, byte[] data) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
+        return encryptWithBase64(Cipher.getInstance(cipher), key, data);
+    }
+
+    public static String encryptWithBase64(Cipher cipher, byte[] key, byte[] data) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        byte[] result = encrypt(cipher, key, data);
+        return Base64.encodeBase64String(result);
+    }
+
     public static String encryptWithBase64(String base64Key, byte[] data) throws IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         return encryptWithBase64(DEFAULT_CIPHER, base64Key, data);
     }
@@ -33,7 +72,7 @@ public class DesUtils {
         return encryptWithBase64(Cipher.getInstance(cipher), base64Key, data);
     }
 
-    public static String encryptWithBase64(Cipher cipher, String base64Key, byte[] data) throws IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public static String encryptWithBase64(Cipher cipher, String base64Key, byte[] data) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         byte[] key = Base64.decodeBase64(base64Key);
         byte[] result = encrypt(cipher, key, data);
         return Base64.encodeBase64String(result);
@@ -58,55 +97,54 @@ public class DesUtils {
     }
 
 
-    public static String decryptWithHex(String hexKey, String hexData) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+    public static byte[] decryptWithHex(String hexKey, String hexData) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
         return decryptWithHex(DEFAULT_CIPHER, hexKey, hexData);
     }
 
-    public static String decryptWithHex(String cipher, String hexKey, String hexData) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+    public static byte[] decryptWithHex(String cipher, String hexKey, String hexData) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
         return decryptWithHex(Cipher.getInstance(cipher), hexKey, hexData);
     }
 
-    public static String decryptWithHex(Cipher cipher, String hexKey, String hexData) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+    public static byte[] decryptWithHex(Cipher cipher, String hexKey, String hexData) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
         return decryptWithHex(cipher, hexKey, CodecUtils.hex2byte(hexData));
     }
 
-    public static String decryptWithHex(String hexKey, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+    public static byte[] decryptWithHex(String hexKey, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
         return decryptWithHex(DEFAULT_CIPHER, hexKey, data);
     }
 
-    public static String decryptWithHex(String cipher, String hexKey, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+    public static byte[] decryptWithHex(String cipher, String hexKey, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
         return decryptWithHex(Cipher.getInstance(cipher), hexKey, data);
     }
 
-    public static String decryptWithHex(Cipher cipher, String hexKey, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
-        byte[] result = decrypt(cipher, CodecUtils.hex2byte(hexKey), data);
-        return CodecUtils.hexString(result);
+    public static byte[] decryptWithHex(Cipher cipher, String hexKey, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+        return decrypt(cipher, CodecUtils.hex2byte(hexKey), data);
     }
 
-    public static String decryptWithBase64(String base64Key, String base64Data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+
+    public static byte[] decryptWithBase64(byte[] key, String base64Data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+        return decryptWithBase64(DEFAULT_CIPHER, key, base64Data);
+    }
+
+    public static byte[] decryptWithBase64(String cipher, byte[] key, String base64Data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+        return decryptWithBase64(Cipher.getInstance(cipher), key, base64Data);
+    }
+
+    public static byte[] decryptWithBase64(Cipher cipher, byte[] key, String base64Data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+        return decrypt(cipher, key, Base64.decodeBase64(base64Data));
+    }
+
+    public static byte[] decryptWithBase64(String base64Key, String base64Data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
         return decryptWithBase64(DEFAULT_CIPHER, base64Key, base64Data);
     }
 
-    public static String decryptWithBase64(String cipher, String base64Key, String base64Data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+    public static byte[] decryptWithBase64(String cipher, String base64Key, String base64Data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
         return decryptWithBase64(Cipher.getInstance(cipher), base64Key, base64Data);
     }
 
-    public static String decryptWithBase64(Cipher cipher, String base64Key, String base64Data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
-        return decryptWithBase64(cipher, base64Key, Base64.decodeBase64(base64Data));
-    }
-
-    public static String decryptWithBase64(String base64Key, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
-        return decryptWithBase64(DEFAULT_CIPHER, base64Key, data);
-    }
-
-    public static String decryptWithBase64(String cipher, String base64Key, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
-        return decryptWithBase64(Cipher.getInstance(cipher), base64Key, data);
-    }
-
-    public static String decryptWithBase64(Cipher cipher, String base64Key, byte[] data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+    public static byte[] decryptWithBase64(Cipher cipher, String base64Key, String base64Data) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
         byte[] key = Base64.decodeBase64(base64Key);
-        byte[] result = decrypt(cipher, key, data);
-        return Base64.encodeBase64String(result);
+        return decrypt(cipher, key, Base64.decodeBase64(base64Data));
     }
 
     public static byte[] decrypt(byte[] key, byte[] data) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
