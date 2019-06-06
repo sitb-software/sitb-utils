@@ -6,7 +6,6 @@ import software.sitb.utils.binary.CodecUtils;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.*;
@@ -29,68 +28,67 @@ public class RSAUtil {
 
     public static final int DEFAULT_PRK_BLOCK_SIZE = 64;
 
-    /**
-     * 使用私钥解密
-     *
-     * @param hexPrivateKey 16进制 表示的私钥
-     * @param ciphertext    密文
-     * @return 明文
-     * @throws Exception 解密失败
-     */
-    public static String privateKeyDecryptWithHex(String hexPrivateKey, byte[] ciphertext) throws Exception {
-        byte[] result = privateKeyDecryptWithDer(hexPrivateKey, ciphertext, Cipher.getInstance(DEFAULT_CIPHER));
-        return CodecUtils.hexString(result);
-    }
-
-    /**
-     * 私钥解密
-     *
-     * @param hexPrivateKey 16进制 表示的私钥
-     * @param ciphertext    密文
-     * @param cipher        填充方式
-     * @return 解密以后的数据
-     */
-    public static byte[] privateKeyDecryptWithDer(String hexPrivateKey, byte[] ciphertext, Cipher cipher) throws BadPaddingException, NoSuchAlgorithmException, IOException, IllegalBlockSizeException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException {
-        return privateKeyDecryptWithDer(hexPrivateKey, 9, ciphertext, cipher);
-    }
-
-    /**
-     * 私钥解密
-     *
-     * @param privateKeyStr 16进制 表示的私钥(der 格式)
-     * @param sequence      私钥段数,如果不包含其他信息,该值为9
-     * @param data          需要解密的数据
-     * @param cipher        填充方式
-     * @return 解密以后的数据
-     */
-    public static byte[] privateKeyDecryptWithDer(String privateKeyStr, int sequence, byte[] data, Cipher cipher) throws NoSuchAlgorithmException, IOException, InvalidKeySpecException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchPaddingException {
-        PrivateKey privateKey = RSA.getPrivateKey(privateKeyStr, sequence);
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        return cipher.doFinal(data);
-    }
+//    /**
+//     * 使用私钥解密
+//     *
+//     * @param hexPrivateKey 16进制 表示的私钥
+//     * @param cipherText    密文
+//     * @return 明文
+//     * @throws Exception 解密失败
+//     */
+//    public static byte[] privateKeyDecryptWithHex(String hexPrivateKey, String cipherText) throws Exception {
+//        return privateKeyDecryptWithHex(hexPrivateKey, cipherText, Cipher.getInstance(DEFAULT_CIPHER));
+//    }
+//
+//    /**
+//     * 私钥解密
+//     *
+//     * @param hexPrivateKey 16进制 表示的私钥
+//     * @param hexCipherText    密文
+//     * @param cipher        填充方式
+//     * @return 解密以后的数据
+//     */
+//    public static byte[] privateKeyDecryptWithHex(String hexPrivateKey, String hexCipherText, Cipher cipher) throws BadPaddingException, NoSuchAlgorithmException, IOException, IllegalBlockSizeException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException {
+//        return privateKeyDecryptWithHex(hexPrivateKey, 9, hexCipherText, cipher);
+//    }
+//
+//    /**
+//     * 私钥解密
+//     *
+//     * @param privateKeyStr 16进制 表示的私钥(der 格式)
+//     * @param sequence      私钥段数,如果不包含其他信息,该值为9
+//     * @param data          需要解密的数据
+//     * @param cipher        填充方式
+//     * @return 解密以后的数据
+//     */
+//    public static byte[] privateKeyDecryptWithHex(String hexPrivateKey, int sequence, String hexCipherText, Cipher cipher) throws NoSuchAlgorithmException, IOException, InvalidKeySpecException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchPaddingException {
+//        PrivateKey privateKey = RSA.getPrivateKey(hexPrivateKey, sequence);
+//        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+//        return cipher.doFinal(data);
+//    }
 
     /**
      * 私钥解密
      *
      * @param privateKeyBase64 私钥
-     * @param encrypted        密文
+     * @param base64CipherText  base64编码的密文
      * @return 解密后的数据
      */
-    public static String privateKeyDecryptWithBase64(String privateKeyBase64, byte[] encrypted) throws Exception {
-        return privateKeyDecryptWithBase64(privateKeyBase64, encrypted, Cipher.getInstance(DEFAULT_CIPHER));
+    public static byte[] privateKeyDecryptWithBase64(String privateKeyBase64, String base64CipherText) throws Exception {
+        return privateKeyDecryptWithBase64(privateKeyBase64, base64CipherText, Cipher.getInstance(DEFAULT_CIPHER));
     }
 
     /**
      * 私钥解密
      *
      * @param privateKeyBase64 私钥
-     * @param encrypted        密文
+     * @param base64CipherText  base64编码的密文
      * @param cipher           填充方式
      * @return 解密后的数据
      */
-    public static String privateKeyDecryptWithBase64(String privateKeyBase64, byte[] encrypted, Cipher cipher) throws Exception {
+    public static byte[] privateKeyDecryptWithBase64(String privateKeyBase64, String base64CipherText, Cipher cipher) throws Exception {
         PrivateKey privateKey = RSA.parsePrivateKeyWithBase64(privateKeyBase64);
-        return Base64.encodeBase64String(privateKeyDecrypt(privateKey, encrypted, cipher));
+        return privateKeyDecrypt(privateKey, Base64.decodeBase64(base64CipherText), cipher);
     }
 
     /**
