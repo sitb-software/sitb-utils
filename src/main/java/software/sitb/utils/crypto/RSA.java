@@ -2,8 +2,8 @@ package software.sitb.utils.crypto;
 
 import org.apache.commons.codec.binary.Base64;
 import software.sitb.utils.binary.CodecUtils;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerValue;
+//import sun.security.util.DerInputStream;
+//import sun.security.util.DerValue;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -30,6 +30,27 @@ public class RSA {
         PrivateKey privateKey = keyPair.getPrivate();
         return new Key(publicKey, privateKey);
     }
+
+    /**
+     * 获取密钥的长度
+     *
+     * @param key 密钥信息
+     * @return 密钥长度
+     * @throws NoSuchAlgorithmException 无效的算法
+     * @throws InvalidKeySpecException  无效的key
+     */
+    public static int getKeySize(java.security.Key key) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        KeyFactory keyFact = KeyFactory.getInstance(key.getAlgorithm());
+        if (key instanceof PublicKey) {
+            RSAPublicKeySpec keySpec = keyFact.getKeySpec(key, RSAPublicKeySpec.class);
+            return keySpec.getModulus().toString(2).length();
+        } else if (key instanceof PrivateKey) {
+            RSAPrivateCrtKeySpec keySpec = keyFact.getKeySpec(key, RSAPrivateCrtKeySpec.class);
+            return keySpec.getModulus().toString(2).length();
+        }
+        return 0;
+    }
+
 
     /**
      * 根据给定的16进制系数和专用指数字符串构造一个RSA专用的公钥对象，并生成公钥。
@@ -89,24 +110,24 @@ public class RSA {
         return keyFactory.generatePrivate(privateKeySpec);
     }
 
-    public static PrivateKey getPrivateKey(String hexDerPrivateKey, int sequence) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        DerInputStream dis = new DerInputStream(CodecUtils.hex2byte(hexDerPrivateKey));
-        DerValue[] ders = dis.getSequence(sequence);
-        //依次读取 RSA 因子信息
-//        int version = ders[0].getBigInteger().intValue();
-        BigInteger modulus = ders[1].getBigInteger();
-        BigInteger publicExponent = ders[2].getBigInteger();
-        BigInteger privateExponent = ders[3].getBigInteger();
-        BigInteger primeP = ders[4].getBigInteger();
-        BigInteger primeQ = ders[5].getBigInteger();
-        BigInteger primeExponentP = ders[6].getBigInteger();
-        BigInteger primeExponentQ = ders[7].getBigInteger();
-        BigInteger crtCoefficient = ders[8].getBigInteger();
-        RSAPrivateCrtKeySpec rsaPrivateKeySpec = new RSAPrivateCrtKeySpec(modulus, publicExponent, privateExponent, primeP, primeQ, primeExponentP, primeExponentQ, crtCoefficient);
-
-        KeyFactory keyFactory = KeyFactory.getInstance(DEFAULT_ALGORITHM);
-        return keyFactory.generatePrivate(rsaPrivateKeySpec);
-    }
+//    public static PrivateKey getPrivateKey(String hexDerPrivateKey, int sequence) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+//        DerInputStream dis = new DerInputStream(CodecUtils.hex2byte(hexDerPrivateKey));
+//        DerValue[] ders = dis.getSequence(sequence);
+//        //依次读取 RSA 因子信息
+////        int version = ders[0].getBigInteger().intValue();
+//        BigInteger modulus = ders[1].getBigInteger();
+//        BigInteger publicExponent = ders[2].getBigInteger();
+//        BigInteger privateExponent = ders[3].getBigInteger();
+//        BigInteger primeP = ders[4].getBigInteger();
+//        BigInteger primeQ = ders[5].getBigInteger();
+//        BigInteger primeExponentP = ders[6].getBigInteger();
+//        BigInteger primeExponentQ = ders[7].getBigInteger();
+//        BigInteger crtCoefficient = ders[8].getBigInteger();
+//        RSAPrivateCrtKeySpec rsaPrivateKeySpec = new RSAPrivateCrtKeySpec(modulus, publicExponent, privateExponent, primeP, primeQ, primeExponentP, primeExponentQ, crtCoefficient);
+//
+//        KeyFactory keyFactory = KeyFactory.getInstance(DEFAULT_ALGORITHM);
+//        return keyFactory.generatePrivate(rsaPrivateKeySpec);
+//    }
 
     /**
      * 读取pem文件中的公钥
@@ -289,12 +310,12 @@ public class RSA {
     private static int[] calLength(String[] bytes, int index, int length) {
         if (length > 128) {
             int i = length - 128;
-            String lenStr = "";
+            StringBuilder lenStr = new StringBuilder();
             for (int j = index + 1; j < index + i + 1; j++)
-                lenStr += bytes[j];
+                lenStr.append(bytes[j]);
 
             index += i;
-            length = Integer.parseInt(lenStr, 16);
+            length = Integer.parseInt(lenStr.toString(), 16);
         }
 
         return new int[]{index, length};

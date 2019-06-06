@@ -23,11 +23,6 @@ public class RSAUtil {
      */
     public static final String DEFAULT_SIGN_ALGORITHMS = "SHA1WithRSA";
 
-
-    public static final int DEFAULT_PK_BLOCK_SIZE = 53;
-
-    public static final int DEFAULT_PRK_BLOCK_SIZE = 64;
-
 //    /**
 //     * 使用私钥解密
 //     *
@@ -71,7 +66,7 @@ public class RSAUtil {
      * 私钥解密
      *
      * @param privateKeyBase64 私钥
-     * @param base64CipherText  base64编码的密文
+     * @param base64CipherText base64编码的密文
      * @return 解密后的数据
      */
     public static byte[] privateKeyDecryptWithBase64(String privateKeyBase64, String base64CipherText) throws Exception {
@@ -82,7 +77,7 @@ public class RSAUtil {
      * 私钥解密
      *
      * @param privateKeyBase64 私钥
-     * @param base64CipherText  base64编码的密文
+     * @param base64CipherText base64编码的密文
      * @param cipher           填充方式
      * @return 解密后的数据
      */
@@ -103,37 +98,9 @@ public class RSAUtil {
         return privateKeyDecrypt(privateKey, encrypted, Cipher.getInstance(DEFAULT_CIPHER));
     }
 
-    public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, int blockSize) throws Exception {
-        return privateKeyDecrypt(privateKey, encrypted, Cipher.getInstance(DEFAULT_CIPHER), blockSize);
-    }
-
     public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, Cipher cipher) throws Exception {
-        return privateKeyDecrypt(privateKey, encrypted, cipher, DEFAULT_PRK_BLOCK_SIZE);
-    }
-
-    public static byte[] privateKeyDecrypt(PrivateKey privateKey, byte[] encrypted, Cipher cipher, int blockSize) throws Exception {
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
-
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            for (int offset = 0; offset < encrypted.length; offset += blockSize) {
-                int inputLen = encrypted.length - offset;
-                if (inputLen > blockSize) {
-                    inputLen = blockSize;
-                }
-
-                byte[] decryptedBlock = cipher.doFinal(encrypted, offset, inputLen);
-                outputStream.write(decryptedBlock);
-            }
-
-            return outputStream.toByteArray();
-        } catch (IllegalBlockSizeException e) {
-            throw new Exception("解密块大小不合法", e);
-        } catch (BadPaddingException e) {
-            throw new Exception("错误填充模式", e);
-        } catch (IOException e) {
-            throw new Exception("字节输出流异常", e);
-        }
+        return execute(privateKey, cipher, encrypted);
     }
 
     /**
@@ -252,14 +219,6 @@ public class RSAUtil {
         return publicKeyEncrypt(publicKey, plaintext, Cipher.getInstance(DEFAULT_CIPHER));
     }
 
-    public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext, Cipher cipher) throws Exception {
-        return publicKeyEncrypt(publicKey, plaintext, cipher, DEFAULT_PK_BLOCK_SIZE);
-    }
-
-    public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext, int blockSize) throws Exception {
-        return publicKeyEncrypt(publicKey, plaintext, Cipher.getInstance(DEFAULT_CIPHER), blockSize);
-    }
-
     /**
      * 公钥加密
      *
@@ -268,27 +227,9 @@ public class RSAUtil {
      * @param cipher    cipher
      * @return 加密后的数据
      */
-    public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext, Cipher cipher, int blockSize) throws Exception {
+    public static byte[] publicKeyEncrypt(PublicKey publicKey, byte[] plaintext, Cipher cipher) throws Exception {
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            for (int offset = 0; offset < plaintext.length; offset += blockSize) {
-                int inputLen = plaintext.length - offset;
-                if (inputLen > blockSize) {
-                    inputLen = blockSize;
-                }
-
-                byte[] encryptedBlock = cipher.doFinal(plaintext, offset, inputLen);
-                outputStream.write(encryptedBlock);
-            }
-            return outputStream.toByteArray();
-        } catch (IllegalBlockSizeException e) {
-            throw new Exception("加密块大小不合法", e);
-        } catch (BadPaddingException e) {
-            throw new Exception("错误填充模式", e);
-        } catch (IOException e) {
-            throw new Exception("字节输出流异常", e);
-        }
+        return execute(publicKey, cipher, plaintext);
     }
 
     public static String signWithBase64(String privateKeyStr, byte[] data) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
@@ -338,5 +279,37 @@ public class RSAUtil {
         sign.initVerify(publicKey);
         sign.update(data);
         return sign.verify(signature);
+    }
+
+    private static int getBlockSize(java.security.Key key) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        int keySize = RSA.getKeySize(key);
+        int blockSize = keySize / 8;
+        if (key instanceof PublicKey) {
+            return blockSize - 11;
+        }
+        return blockSize;
+    }
+
+    private static byte[] execute(java.security.Key key, Cipher cipher, byte[] data) throws Exception {
+        int blockSize = getBlockSize(key);
+
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            for (int offset = 0; offset < data.length; offset += blockSize) {
+                int inputLen = data.length - offset;
+                if (inputLen > blockSize) {
+                    inputLen = blockSize;
+                }
+                byte[] block = cipher.doFinal(data, offset, inputLen);
+                outputStream.write(block);
+            }
+            return outputStream.toByteArray();
+        } catch (IllegalBlockSizeException e) {
+            throw new Exception("块大小不合法", e);
+        } catch (BadPaddingException e) {
+            throw new Exception("错误填充模式", e);
+        } catch (IOException e) {
+            throw new Exception("字节输出流异常", e);
+        }
     }
 }
