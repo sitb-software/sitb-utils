@@ -1,15 +1,15 @@
 plugins {
-    id "io.franzbecker.gradle-lombok" version "1.14"
+    id "io.franzbecker.gradle-lombok" version "2.2"
 }
+
+group 'software.sitb'
+version '1.0.32.RELEASE'
 
 apply from: 'https://onegit.app/enterprise/public/raw/master/libraries.gradle'
 apply from: 'https://onegit.app/enterprise/public/raw/master/java.gradle'
 apply from: 'https://onegit.app/enterprise/public/raw/master/idea.gradle'
-apply from: 'https://onegit.app/enterprise/public/raw/master/wrapper.gradle'
 apply from: 'https://onegit.app/enterprise/public/raw/master/publishing-with-source.gradle'
 
-group 'software.sitb'
-version '1.0.32.RELEASE'
 
 repositories {
     maven { url "${project.'owner.repo'}" }
