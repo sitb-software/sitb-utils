@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'software.sitb'
-version '1.0.32.RELEASE'
+version '1.0.33.RELEASE'
 
 apply from: 'https://onegit.app/enterprise/public/raw/master/libraries.gradle'
 apply from: 'https://onegit.app/enterprise/public/raw/master/java.gradle'

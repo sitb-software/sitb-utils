@@ -15,6 +15,7 @@ public class StringUtils {
      * @param string 需要判断的字符串
      * @return boolean 判断结果
      */
+    @Deprecated
     public static boolean isEmpty(String string) {
         return (string == null) || (string.trim().isEmpty());
     }
@@ -25,6 +26,7 @@ public class StringUtils {
      * @param length 生成的随机数长度
      * @return 随机数
      */
+    @Deprecated
     public static String randomStr(int length) {
         StringBuilder stringBuilder = new StringBuilder();
 
