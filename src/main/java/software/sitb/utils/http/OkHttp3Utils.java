@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author 田尘殇Sean(sean.snow@live.com) createAt 2017/6/5.
+ * @author 田尘殇Sean(sean.snow @ live.com) createAt 2017/6/5.
  */
 public class OkHttp3Utils {
 
@@ -47,7 +47,7 @@ public class OkHttp3Utils {
         return body.bytes();
     }
 
-    public static Builder builder(){
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -157,13 +157,13 @@ public class OkHttp3Utils {
                 } else {
                     cookieStore.addAll(newStore);
                 }
-                cookieStores.put(url.uri().toString(), cookieStore);
+                cookieStores.put(url.host(), cookieStore);
             }
         }
 
         @Override
         public List<Cookie> loadForRequest(HttpUrl url) {
-            OkHttp3Utils.CookieStore cookieStore = cookieStores.get(url.uri().toString());
+            OkHttp3Utils.CookieStore cookieStore = cookieStores.get(url.host());
             return null == cookieStore || cookieStore.isEmpty() ? new ArrayList<>() : cookieStore.getCookies();
         }
 
